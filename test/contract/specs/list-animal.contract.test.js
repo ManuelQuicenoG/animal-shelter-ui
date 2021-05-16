@@ -1,11 +1,13 @@
-import {Matchers} from '@pact-foundation/pact';
-import {AnimalController} from '../../../controllers';
-import {provider} from '../config/initPact';
+import { Matchers } from '@pact-foundation/pact';
+import { AnimalController } from '../../../controllers';
+import { provider } from '../config/initPact';
 
 describe('Animal Service', () => {
+    beforeAll(async() => {
+        await provider.setup();
+    });
     describe('When a request to list all animals is made', () => {
         beforeAll(async () => {
-            await provider.setup();
             await provider.addInteraction({
                 uponReceiving: 'a request to list all animals',
                 state: "has animals",
@@ -21,7 +23,7 @@ describe('Animal Service', () => {
                             breed: Matchers.like("Bengali"),
                             gender: Matchers.like("Female"),
                             vaccinated: Matchers.boolean(true)
-                        }
+                        }, {min: 1}
                     )
                 }
             });
@@ -34,6 +36,6 @@ describe('Animal Service', () => {
             await provider.verify()
         });
 
-        afterAll(() => provider.finalize());
+        afterAll(async() =>await provider.finalize());
     });
 });
